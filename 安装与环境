@@ -1,0 +1,4 @@
+使用在命令行以下三条命令来完成安装
+pip install kivy
+pip install kivy.deps.sdl2
+python -m pip install docutils pygments pypiwin32 kivy.deps.sdl2 kivy.deps.glew 
