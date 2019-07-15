@@ -3,4 +3,4 @@ pip install kivy
 pip install kivy.deps.sdl2
 python -m pip install docutils pygments pypiwin32 kivy.deps.sdl2 kivy.deps.glew 
 
-![](https://github.com/SuperrrWu/kivy_app/blob/master/Image/kivy_1.JPG)
+![神经网络原理图](https://github.com/SuperrrWu/deep-learning/blob/master/Image/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%B1%95%E7%A4%BA%E5%9B%BE.jpg)
