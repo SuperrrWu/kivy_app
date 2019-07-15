@@ -1,0 +1,71 @@
+kivy 坐标系统
+
+kivy 的坐标原点位于窗口的左下角，x 轴正方向为水平向右，y 轴正方向为竖直向上。这和我们中学数学中常见的平面直角坐标系是一模一样的。
+
+绘制圆点
+
+    
+  from kivy.app import App
+  from kivy.uix.widget import Widget
+  from kivy.graphics import Color, Ellipse
+ 
+ 
+  class MyPaintWidget(Widget):
+      def on_touch_down(self, touch):
+          with self.canvas:
+              Color(1, 1, 0)
+              d = 30.
+              Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
+ 
+ 
+  class MyPaintApp(App):
+      def build(self):
+          return MyPaintWidget()
+ 
+ 
+  if __name__ == '__main__':
+      MyPaintApp().run()
+      
+第 8 行 with self.canvas: ，使用 with 语句进入自定义窗口部件 (MyPaintWidget) 的画布 (canvas) 上下文。窗口部件 (widget) 的画布 (canvas) 对应窗口部件在屏幕上的显示区域，我们可以在上面绘制各种图形。执行第 8 行代码之后，后续的绘图语句就会在这个画布上绘制出各种图形了。with 语句还能确保当我们退出画布上下文的时候，程序自动清理与画布有关的内部状态并释放相应的资源。
+
+第 9 行 Color(1, 1, 0) 将画笔的颜色设置为黄色。Color 采用 RGB（红、绿、蓝）三原色来表示颜色，每个颜色分量的取值为 [0, 1] 之间。这里我们混合红色和绿色（第 1, 2 个参数为 1），剔除蓝色（第 3 个参数为 0），根据三原色的原理，我们将得到黄色。设置好颜色之后，后续的绘图都将采用这个颜色，直到你用 Color 函数再次改变颜色。这就好像你用画笔蘸上黄色的颜料（调用 Color 函数），你随后画出的图案就都是黄色的，一直到你再蘸其他的颜料（再次调用 Color 函数），改变画笔的颜色。
+
+第 10 行 d = 30.设置圆的直径，后续的代码将根据变量 d 的值来画圆。如果，我们想改变圆的大小，只要修改变量 d 的值就可以了，这也是将圆的直径保存到变量中，给程序带来的灵活性。
+
+第 11 行 Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d)) 调用Ellipse 函数在鼠标点击的位置，按照指定的直径画圆。Ellipse 函数中，圆的位置用圆的外切正方形来表示。其中，第 1 个参数 pos 表示外切正方形左下角的坐标（x, y），第 2 个参数 size 表示外切正方形的大小（宽、高）。我们想要让圆心落在鼠标点击的位置，因此，对应的外切正方形左下角坐标为  (touch.x - d / 2, touch.y - d / 2)
+
+
+绘制线条
+
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.graphics import Color, Ellipse, Line
+ 
+ 
+class MyPaintWidget(Widget):
+    def on_touch_down(self, touch):
+        with self.canvas:
+            Color(1, 1, 0)
+            d = 30.
+            Ellipse(pos=(touch.x - d / 2, touch.y - d / 2), size=(d, d))
+            touch.ud['line'] = Line(points=(touch.x, touch.y))
+ 
+    def on_touch_move(self, touch):
+        touch.ud['line'].points += [touch.x, touch.y]
+ 
+ 
+class MyPaintApp(App):
+    def build(self):
+        return MyPaintWidget()
+ 
+ 
+if __name__ == '__main__':
+    MyPaintApp().run()
+    
+第 3 行 from kivy.graphics import Color, Ellipse, Line我们导入函数 Line 用于绘制线条。函数 Line 接受一个由一系列点的坐标所构成的列表，然后依次在相邻 2 点之间绘制线条。
+
+第 12 行中的 touch.ud 是一个 Python 字典 (dict)，我们可以用它来存储与 touch 事件相关的数据。整个第 12 行 touch.ud['line'] = Line(points=(touch.x, touch.y)) 表示的意思是，当鼠标按下时（触发 on_touch_down 事件），以鼠标点击的位置 (touch.x, touch.y) 为起点绘制线条（调用 Line 函数），然后将该线条保存到 touch.ud 字典中（对应的 key 值为 ‘line’）。由于，鼠标点击只能产生 1 个点，而 1 个点是没有办法绘制线条的，所以单纯的鼠标点击是无法在屏幕上看到任何线条的。但是，这里确实产生了一个线条，并且我们将它保存到 touch.ud[‘line’] 中，随后的代码将继续往这个线条中添加坐标点，而一系列点的连线就可以显示出来了。
+
+第 14 行 def on_touch_move(self, touch):  添加了一个新的方法 on_touch_move。当用户拖拽鼠标时，将触发该函数（执行该函数中的代码）。一次鼠标拖拽通常会连续多次触发 on_touch_move 方法，相当于将一次移动拆解成很多个微小的移动，而每一次移动的位置则通过 touch 参数传递给 on_touch_move 方法。
+
+第 15 行 touch.ud['line'].points += [touch.x, touch.y] 将鼠标拖拽产生的坐标点，添加到保存在 touch.ud[‘line’] 中的线条中。
